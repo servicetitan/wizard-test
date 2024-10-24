@@ -1,0 +1,22 @@
+{
+    "stryker-config": {
+        "solution": "./YOUR.SOLUTION.NAME.sln",
+        "reporters": [
+            "html",
+            "json",
+            "progress"
+        ],
+        "mutate": [
+            "!**/Program.cs",
+            "!**/MockLogger.cs",
+            "!**/Generator.cs",
+            "!**/Generators.cs",
+            "!**/*.Generated.cs"
+        ],
+        "thresholds": {
+            "high": 95,
+            "low": 90,
+            "break": 90
+        }
+    }
+}

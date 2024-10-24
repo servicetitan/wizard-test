@@ -1,0 +1,162 @@
+# Runs on every commit to main
+name: cd-official
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths-ignore: 
+      - .iac/kubernetes/**
+
+  workflow_dispatch:
+    inputs:
+      tool-version:
+        required: false
+        default: 'latest'
+        description: Version of the IAC CLI tool to use. Defaults to 'latest'
+      infra_iac_branch:
+        required: false
+        default: 'latest'
+        description: infra-iac branch name for testing
+      allow-resources-deletion:
+        required: false
+        default: 'false'
+        description: Whether to allow resources deletion in Terraform
+      skip-flux-observability-check:
+        required: false
+        default: 'false'
+        description: Whether to skip the observability check for Flux
+
+env:
+  IACCLI_VERSION: ${{ inputs.tool-version || 'latest'}}
+
+jobs:
+
+  matrixgen:
+    name: generate-matrix
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.ST_INFRA_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.ST_INFRA_PLATFORM_APP_SECRET }}
+          owner: ${{ github.repository_owner }} # If owner and repositories are empty, access will be scoped to only the current repository.
+
+      - name: Generate matrix
+        id: generate-matrix
+        uses: servicetitan/infra-iac-poc/actions/generate-matrix@master
+        with:
+          official: 'true' # Must be a string!
+          manifest-file: ./.iac/environments.yaml
+          tool-version: ${{ env.IACCLI_VERSION }}
+          token: ${{ secrets.GH_TOKEN }}
+          gh-token: ${{ steps.app-token.outputs.token }}
+
+  build:
+    runs-on: ubuntu-24.04
+
+    outputs:
+      image-name: ${{ steps.build.outputs.image-name }}
+      image-version: ${{ steps.build.outputs.image-version }}
+      artifact-name: ${{ steps.build.outputs.artifact-name }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        id: build
+        uses: servicetitan/infra-iac-poc/actions/docker-build@master
+        with:
+          context-path: '.'
+          dockerfile-path: './Dockerfile'
+          target-name: web-api
+          image-name: repoNamePlaceholder
+          build-args: 'ST__NuGetKey=${{ secrets.ST_NUGET_PASSWORD }}'
+
+  deploy:
+    runs-on: ubuntu-24.04
+
+    needs:
+      - matrixgen
+      - build
+      
+    strategy:
+      max-parallel: 1
+      fail-fast: true
+      matrix:
+        include: ${{ fromJson(needs.matrixgen.outputs.matrix) }}
+
+    environment: ${{ matrix.environment }}
+    concurrency: ${{ matrix.environment }}-${{ matrix.stamp }}
+
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      issues: read
+      checks: write
+      actions: read
+      deployments: write
+      discussions: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+
+    steps:
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.ST_INFRA_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.ST_INFRA_PLATFORM_APP_SECRET }}
+          owner: ${{ github.repository_owner }}
+      
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+        
+      - name: Deploy
+        uses: servicetitan/infra-iac-poc/actions/deploy@master
+        with:
+          subscription-id: ${{ vars.ENV_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.ENV_DEPLOY_CLIENTID }}
+          environment: ${{ matrix.environment }}
+          stamp: ${{ matrix.stamp }}
+          container-version-path: './.iac/kubernetes/environments/${{ matrix.environment }}/stamps/${{ matrix.stamp }}/service/container-version.yaml'
+          
+          image-repository: ${{ needs.build.outputs.image-name }}
+          image-version: ${{ needs.build.outputs.image-version }}
+          artifact-name: ${{ needs.build.outputs.artifact-name }}
+          
+          cypress-run: 'false'
+          #cypress-config-file: config/dispatch.config.ts
+          #cypress-spec: Cypress/Tests/E2E/DIS/DispatchCenter/Header/*.ts
+          #cypress-morph-script: ./.github/workflows/update-cypressConfig.ps1
+
+          manifest-path: ./.iac/environments.yaml
+          tool-version: ${{ env.IACCLI_VERSION }}
+          cypress-token: ${{ secrets.ST_CYPRESS_PAT }}
+          token: ${{ github.token }}
+          gh-token: ${{ steps.app-token.outputs.token }}
+          infra-iac-deploy-key: ${{ secrets.ST_INFRA_IAC_DEPLOY_KEY }}
+          bringer-redis-connection-string: ${{ secrets.ST_BRINGER_REDIS_CONNECTION_STRING }}
+
+          allow-resources-deletion: ${{ inputs.allow-resources-deletion || 'false' }}
+          skip-flux-observability-check: ${{ inputs.skip-flux-observability-check || 'false' }}

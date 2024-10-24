@@ -1,0 +1,3 @@
+- op: replace
+  path: /spec/values/metadata/instance
+  value: dev-wus201

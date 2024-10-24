@@ -1,0 +1,97 @@
+build:
+  app:
+    context: .
+    dockerfile: ./Dockerfile
+    target: web-api
+    args:
+      ST__NuGetKey: $ST__NuGetKey
+  debug:
+    context: .
+    dockerfile: ./Dockerfile
+    target: web-api
+    args:
+      ST__NuGetKey: $ST__NuGetKey
+
+# Note: Following is an example of how to define dependencies and teams can uncomment and modify as needed
+# dependencies: 
+#   some-dependent-repo:
+#     repository: https://github.com/servicetitan/some-dependent-repo.git
+#     manifest: okteto.yaml
+#     branch: master-or-some-branch
+#     wait: true
+#     timeout: 15m
+#     variables:
+#       GH_TOKEN: $GH_TOKEN
+#       ST__NuGetKey: $ST__NuGetKey
+
+deploy:
+  image: 'a744bfb7vacr.azurecr.io/iac:0.3.1'
+  commands:
+    - name: Set env vars
+      command: |
+        {
+          echo "ARM_CLIENT_ID=$DEPLOY_CLIENTID"
+          echo "ARM_CLIENT_SECRET=$DEPLOY_CLIENTSECRET"
+          echo "ARM_SUBSCRIPTION_ID='09cd32a3-e925-4abb-a8e3-c442a31e2405'"
+        } >> "$OKTETO_ENV"
+
+    - name: Set git cli auth
+      command: |
+        cat << EOF > ~/.netrc
+          machine github.com
+          login some-login
+          password ${GH_TOKEN}
+
+          machine api.github.com
+          login some-login
+          password ${GH_TOKEN}
+        EOF
+
+    - name: Deploy Azure resources
+      command: |
+        az login --service-principal --username $DEPLOY_CLIENTID --password $DEPLOY_CLIENTSECRET --tenant $DEPLOY_TENANTID \
+        && iac deployment dev tfcreate -f ./.iac/environments.yaml -n ${OKTETO_NAMESPACE}
+
+    - name: Deploy Kustomization
+      command: |
+        kubectl kustomize ./.iac/kubernetes/environments/dev --namespace ${OKTETO_NAMESPACE} \
+        | iac deployment dev replace-tokens -f ./.iac/environments.yaml -v error \
+        | kubectl apply --namespace ${OKTETO_NAMESPACE} -f -
+
+destroy:
+  image: 'a744bfb7vacr.azurecr.io/iac:0.3.1'
+  commands:
+    - name: Set git cli auth
+      command: |
+        cat << EOF > ~/.netrc
+          machine github.com
+          login some-login
+          password ${GH_TOKEN}
+
+          machine api.github.com
+          login some-login
+          password ${GH_TOKEN}
+        EOF
+
+    - name: Delete Azure resources
+      command: |
+        az login --service-principal --username $DEPLOY_CLIENTID --password $DEPLOY_CLIENTSECRET --tenant $DEPLOY_TENANTID \
+        && iac deployment dev destroy -f ./.iac/environments.yaml -n ${OKTETO_NAMESPACE} --force
+
+external:
+
+dev:
+  wizard-test-dev-service:
+    image: ${OKTETO_BUILD_DEBUG_IMAGE}
+    sync:
+      folders:
+        - ./:/app
+      rescanInterval: 100
+      compression: true
+    environment:
+      ST__NuGetKey: $ST__NuGetKey
+      DOTNET_ENVIRONMENT: development-container
+      ASPNETCORE_ENVIRONMENT: development-container
+      TEST_RESULTS_DIRECTORY: /app/test-results
+      COVERAGE_REPORT_DIRECTORY: /app/test-results/coverage-report
+      DatabaseSchemaOptions__ScriptLocation: /app/sql

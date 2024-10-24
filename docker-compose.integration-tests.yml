@@ -1,0 +1,20 @@
+services:
+  tests:
+    build:
+      context: .
+      target: build
+    env_file:
+      - ./variables.env
+    command: >
+      sh -c 'for dir in tests/*IntegrationTests; do
+      dotnet test $$dir
+      --collect:"XPlat Code Coverage"
+      --results-directory "./artifacts/tests/output"
+      --configuration Debug
+      --logger "trx"
+      ;done'
+    depends_on:
+      - storage
+
+    volumes:
+      - "./artifacts/tests/output:/src/artifacts/tests/output"

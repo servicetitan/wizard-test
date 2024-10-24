@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="ServiceTitan.Platform.Diagnostics"/>
+    <PackageReference Include="Scrutor"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions"/>
+    <PackageReference Include="FluentValidation"/>
+  </ItemGroup>
+
+</Project>

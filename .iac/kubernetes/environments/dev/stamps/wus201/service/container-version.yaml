@@ -1,0 +1,3 @@
+- op: replace
+  path: /spec/values/image/repository
+  value: <acr.name>.azurecr.io/<image-name>:latest

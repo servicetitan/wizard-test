@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: prometheus-operator
+    role: alert-rules
+    release: prometheus-operator
+  name: app-alert-rules
+spec:
+  groups:
+    - name: app-alerts
+      rules:        
+        - alert: ErrorLogs
+          expr: sum group by (metadata_instance) (increase(st_logging_events_total{metadata_project="wizard-test", level="Error"}[1m])) > 5
+          for: 10m
+          labels:
+            severity: warning
+            team: wizard-test
+          annotations:
+            summary: '{{$value | humanize}} error logs produced in the last minute'
+            description: Errors log rate is high

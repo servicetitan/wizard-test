@@ -1,0 +1,14 @@
+services:
+
+  storage:
+    image: "mcr.microsoft.com/azure-storage/azurite:latest"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+
+
+
+
+
+
+

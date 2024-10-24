@@ -1,0 +1,57 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: service
+spec:
+  interval: 10m0s
+  releaseName: service
+  chart:
+    spec:
+      chart: st-app
+      version: 2.0.52
+      sourceRef:
+        kind: HelmRepository
+        name: servicetitan
+        namespace: infra
+  values:
+    image:
+      repository: kustomize:will:replace
+    metadata:
+      project: wizard-test
+      instance: kustomize:will:replace
+      component: service
+      team: infra
+      repository: repoNamePlaceholder
+    serviceAccount:
+      name: service
+    metrics:
+      scrape:
+        enabled: true
+    podLabels:
+      azure.workload.identity/use: "true"
+    env:
+    - name: Test__Secret
+      valueFrom:
+        secretKeyRef:
+          name: service
+          key: test-secret
+    vault:
+      enabled: false
+    datadog:
+      enabled: false
+    probes:
+      enabled: false
+    resources:
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+    volumeMounts:
+      - name: secrets
+        mountPath: /no/matter/what/path
+    volumes:
+      - name: secrets
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: service

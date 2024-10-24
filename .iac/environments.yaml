@@ -1,0 +1,173 @@
+# Master switch to enable/disable execution of infrastructure and
+# application deployments.
+enabled: true
+
+# version of infra-iac platform TF modules
+iacVersion:
+  subscription: 0.2.38
+  environment: 0.2.38
+  environmentService: 0.2.38
+  stamp: 0.2.38
+  stampService: 0.2.38
+
+# Specification of service group across all the services
+# within a domain.
+serviceGroup:
+  # Reference another repository instead of defining your own:
+  # repo: https://github.com/servicetitan/dispatch-center-api
+  #
+  # - OR -
+  #
+  # If this is the root repository, all other fields are required.
+  name: wizard-test
+  team: infra
+  contact: '#page-infra'
+  billingScope: '/providers/Microsoft.Billing/billingAccounts/65865377/enrollmentAccounts/349945'
+
+  #
+  # This service group's subscriptions, environments and stamps are defined
+  # here. Because this is happening at the service group level, all other
+  # services in a group do not need to re-define these specifications.
+  #
+  # All subscriptions are created in the "services" management group
+  # and therefore subject to the policies defined there and in any
+  # parent group.   
+  subscriptions:
+    # Your service's subscription(s)
+    - name: 'Wizard test / DevTest'
+      subscriptionId: '779a5063-23c3-4ca8-9294-7c37c60e3e10' # See readme
+      # A key used to differentiate subscriptions. This makes it so
+      # that the name field can be used as a display name of sorts
+      # and provides a stable identitfier in case the display name
+      # ever changes.
+      key: devtest
+      # What workloads are allowed in this subscription. Must be either
+      # "production" or "non-production". This will inform automation to
+      # set up policies appropriately based on the intended use.
+      workload: non-production
+      # The name of the identity (from the AAD YAML) will be used to
+      # deploy to this subscription. Make sure you include your
+      # team in this list!
+      # owners:
+      #   - "{objectId}"
+      #   - "{objectId}"
+      # Location for deployment metadata storage
+      owners:
+        - "squadGroupIdPlaceholder"
+      roleAssignments:
+        # Owner
+        - roleId: 8e3af657-a8ff-443c-a75c-2fe8c4bcb635
+          objectIds:
+            - ownerGroupIdPlaceholder
+        # AcrPull
+        - roleId: 7f951dda-4ed3-4680-a7ca-43fe172d538d
+          objectIds:
+            - ownerGroupIdPlaceholder
+        # Key vault
+        # Secrets
+        - roleId: b86a8fe4-44ce-4948-aee5-eccb2c155cd7 # Key Vault Secrets Officer
+          objectIds:
+            - ownerGroupIdPlaceholder
+        # Certificates
+        - roleId: a4417e6f-fecd-4de8-b567-7b0420556985 # Key Vault Certificates Officer
+          objectIds:
+            - ownerGroupIdPlaceholder
+        # Keys
+        - roleId: 14b46e9e-c2b7-41b4-b07b-48a6ebf60603 # Key Vault Crypto Officer
+          objectIds:
+            - ownerGroupIdPlaceholder
+      location: westus2
+      # Optional: Request additional quota for specific VM sizes
+      quotas:
+        compute:
+        - sku: 'standardDASv4Family'
+          location: westus2
+          limit: 175
+        - sku: 'standardDASv4Family'
+          location: eastus2
+          limit: 175
+
+  environments:
+    # Your service's environment(s)
+    # Choose a short name, this will show up all over the place
+    # like deployment names, resource group names, and even
+    # DNS zones.
+    - name: dev
+      # The key of ths subscription this environment deploys to.
+      subscription: devtest
+      # The location for this environment's resource group.
+      location: westus2
+
+  stamps:
+    # Choose a short name, this will show up all over the place
+    # like deployment names, resource group names, and even
+    # DNS zones.
+    - name: wus201
+      location: westus2
+      # Optional: A list of stamp names that must successfully
+      # deploy before this one can be deployed. This is used both
+      # for IaC deployments and for application deployments.
+      dependsOn: []
+      # The list of environments that this stamp deploys to.
+      environments:
+        - dev
+      # AKS deployment parameters
+      aks:
+        # Whether to deploy AKS in this stamp. By default this
+        # is set to 'false' to speed up your first deployment.
+        # Once you have committed your code to your trunk branch
+        # and followed the instructions in the readme, you can
+        # change this to 'true' to get started.
+        deploy: true
+        sysPoolOptions:
+          availabilityZones: [ '1', '2', '3' ]
+          vmSize: standard_d4as_v4
+          count: 3
+          minCount: 3
+          maxCount: 6
+          enableAutoScaling: true
+          maxPods: 30
+          osSku: 'Ubuntu'
+          osDiskSizeGb: 128
+          osDiskType: 'Managed'
+        userPoolOptions:
+          availabilityZones: [ '1', '2', '3' ]
+          vmSize: standard_d4as_v4
+          count: 3
+          minCount: 3
+          maxCount: 6
+          enableAutoScaling: true
+          maxPods: 30
+          osSku: 'Ubuntu'
+          osDiskSizeGb: 128
+          osDiskType: 'Managed'
+
+# Metadata about the service in this repository.
+service:
+  # A name, used for tagging and tracking and parts of some
+  # naming of resources in Azure.
+  name: service
+  # Relative path to the AAD specification for this service.
+  aad: ./aad.yaml
+  # Relative path of the bicep files that are used to define
+  # resources. These files are named by convention and are
+  # all required to exist:
+  #
+  #   - subscription.bicep
+  #   - environment.bicep
+  #   - stamp.bicep
+  #
+  tf: ./tf/
+  deployServiceOuter: true
+
+  # Register additional resource providers required by
+  # this service's infrastructure. This is the minimum
+  # list.
+  resourceProviderRegistrations:
+  - 'Microsoft.OperationsManagement'
+  - 'Microsoft.Capacity'
+
+  # Register optional resource provider features.
+  # featureRegistrations:
+  # - namespace: 'Microsoft.ContainerService'
+  #   name: 'EnableImageCleanerPreview'

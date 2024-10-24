@@ -1,0 +1,113 @@
+# Initiailize files for IAC
+name: initialize
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscriptions:
+        required: false
+        default: ''
+        description: 'JSON string with subscriptions. Example: ''[{"name": "Infra sandbox", "subscriptionId": "eac7ab10-a55c-45ee-b87d-d27b337c7d40", "key": "sandbox", "workload": "production"}]''. Check `src/template/.iac/environments.yaml` for complete example'
+      environments:
+        required: false
+        default: ''
+        description: 'JSON string with environments. Example: ''[{"name": "cicddemo", "subscription": "sandbox"}]''. Check `src/template/.iac/environments.yaml` for complete example'
+      stamps:
+        required: false
+        default: ''
+        description: 'JSON string with stamps. Example: ''[{"name": "wus202", "environments": ["cicddemo"]}, {"name": "wus201", "environments": ["cicddemo"]}]''. Check `src/template/.iac/environments.yaml` for complete example'
+      serviceGroupName:
+        required: false
+        default: ''
+        description: Service group name
+      serviceGroupTeam:
+        required: false
+        default: ''
+        description: Service group team
+      serviceName:
+        required: false
+        default: ''
+        description: Service name
+
+env:
+  IACCLI_VERSION: ${{ inputs.tool-version || 'latest'}}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: 'cicddemo' # we need env to read secrets.ENV_DEPLOY_CLIENTID. TODO: solve this
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      issues: read
+      checks: write
+      actions: read
+      deployments: write
+      discussions: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.ST_INFRA_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.ST_INFRA_PLATFORM_APP_SECRET }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Install IAC
+        uses: servicetitan/infra-iac-poc/actions/install-iac@master
+        with:
+          subscription-id: ${{ vars.ENV_SUBSCRIPTIONID }}
+          client-id: ${{ secrets.ENV_DEPLOY_CLIENTID }}
+          tool-version: ${{ env.IACCLI_VERSION }}
+          gh-token: ${{ steps.app-token.outputs.token }}
+          skip-update-manifest: true
+
+      - name: set git config
+        run: |
+          git config user.email "iac@servicetitan.com"
+          git config user.name "iac"
+
+      - name: Initialize environments.yaml
+        shell: pwsh
+        run: ./.github/workflows/init_envs_yaml.ps1
+        env:
+          SUBSCRIPTIONS: ${{ inputs.subscriptions }}
+          ENVIRONMENTS: ${{ inputs.environments }}
+          STAMPS: ${{ inputs.stamps }}
+          SERVICE_GROUP_NAME: ${{ inputs.serviceGroupName }}
+          SERVICE_GROUP_TEAM: ${{ inputs.serviceGroupTeam }}
+          SERVICE_NAME: ${{ inputs.serviceName }}
+      - name: check for changes
+        id: git_status_init_envs_yaml
+        run: echo "changes=$(git status --porcelain)" >> "$GITHUB_OUTPUT"
+      - name: stage changed files
+        if: steps.git_status_init_envs_yaml.outputs.changes != ''
+        run: git add .
+      - name: commit changed files
+        if: steps.git_status_init_envs_yaml.outputs.changes != ''
+        run: git commit -m "[no ci] Initialized environments.yaml"
+
+      - name: Update template files
+        run: iac init --force --init-template
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: check for changes
+        id: git_status_init_template
+        run: echo "changes=$(git status --porcelain)" >> "$GITHUB_OUTPUT"
+      - name: stage changed files
+        if: steps.git_status_init_template.outputs.changes != ''
+        run: git add .
+      - name: commit changed files
+        if: steps.git_status_init_template.outputs.changes != ''
+        run: git commit -m "[no ci] Updated template files"
+
+      - name: push code to origin
+        run: git push

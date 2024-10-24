@@ -1,0 +1,37 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: service
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: letsencrypt@servicetitan.com
+    privateKeySecretRef:
+      name: letsencrypt-acme
+    solvers:
+      - http01:
+          ingress:
+            serviceType: ClusterIP
+            class: nginx
+      - selector:
+          dnsZones:
+            - replaceme.st.dev
+        dns01:
+          azureDNS:
+            subscriptionID: 'replaceme'
+            resourceGroupName: 'replaceme'
+            hostedZoneName: 'replaceme.st.dev'
+            environment: AzurePublicCloud
+            managedIdentity:
+              clientID: 'replaceme'
+      - selector:
+          dnsZones:
+            - replaceme.st.dev
+        dns01:
+          azureDNS:
+            subscriptionID: 'replaceme'
+            resourceGroupName: 'replaceme'
+            hostedZoneName: 'replaceme.st.dev'
+            environment: AzurePublicCloud
+            managedIdentity:
+              clientID: 'replaceme'
