@@ -1,0 +1,62 @@
+# The roles supported by this application. Roles are
+# synonymous with identity permissions.
+roles:
+  - name: administrator
+    description: 'Grants administrative access to all endpoints'
+  - name: user
+    description: 'Grants limited access to all endpoints'
+
+# The scopes that this service supports. In addition to
+# these, there is always a ".default" scope create for
+# any application that implicitly includes all scopes.
+scopes:
+  - name: jobs.read
+
+# Identities used by the service for calling APIs. This
+# can, optionally, include the Azure API itself and you can
+# define the RBAC roles for each identity.
+identities:
+
+  # This name matches the application entry below and that is
+  # OK. Applications and identities can have the same name.
+  - name: api.qa.helloworld.st.dev
+    # A list of subscriptions that will have access to the secrets
+    # for this identity.
+    subscriptions:
+      - devtest
+  
+  - name: monolith.qa.helloworld.st.dev
+    subscriptions:
+      - devtest
+
+# Define which applications this service owns and what
+# other services' applications are allowed access and
+# which scopes they are allowed to request tokens for.
+applications:
+  # An application to represent the service in pre-
+  # production environments.
+  - name: api.qa.helloworld.st.dev
+    # The scope access granted to other services'
+    # applications.
+    access:
+      - name: monolith.qa.helloworld.st.dev
+        scopes:
+          # An example of allowing access to the default
+          # scope for the application.
+          - .default
+          # An example of limited scope. Make sure to
+          # only use items defined in 'scopes'.
+          - jobs.read
+
+    # The role assignments for other services' identities.
+    assignments:
+      # Another service's identity, referenced by name.
+      # This identity would be defined in the "identities"
+      # section of that service's AAD declaration.
+      - assignee: monolith.qa.helloworld.st.dev
+        role: user
+      # A direct assignment to a user or group, using their
+      # objectId. At least your team group should be included
+      # as one of the entries.
+      - assignee: {objectId}
+        role: administrator

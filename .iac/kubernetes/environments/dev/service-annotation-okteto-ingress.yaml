@@ -1,0 +1,12 @@
+# service:
+#   annotations:
+#     dev.okteto.com/auto-ingress: "true"
+- op: add
+  path: /spec/values/service
+  value: {}
+- op: add
+  path: /spec/values/service/annotations
+  value: {}
+- op: add
+  path: /spec/values/service/annotations/dev.okteto.com~1auto-ingress
+  value: "true"

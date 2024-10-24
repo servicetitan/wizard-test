@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <UseDefaultStartup>true</UseDefaultStartup>
+      <XunitStartupAssembly>ServiceTitan.WizardTest.Host.Web.IntegrationTests</XunitStartupAssembly>
+      <XunitStartupFullName>Host.Web.IntegrationTests.Startup</XunitStartupFullName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Client\Client.csproj" />
+      <ProjectReference Include="..\Host.Web.IntegrationTests\Host.Web.IntegrationTests.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
+  <PropertyGroup>
+    <!-- CA1034 - Do not nest type -->
+    <!-- CA1822	- Member can be marked as static -->
+    <!-- VSTHRD200 - Use Async suffix for async methods -->
+    <!-- RCS1090: Call 'ConfigureAwait(false)' -->
+    <!-- CS8604:  Possible null reference argument -->
+    <!-- xUnit1000: To be able to ignore test classes  -->
+    <NoWarn>1701;1702;CA1034;CA1822;VSTHRD200;RCS1090;CS8604;xUnit1000</NoWarn>
+    <IsPackable>False</IsPackable>
+    <IsPublishable>False</IsPublishable>
+    <Nullable>disable</Nullable>
+    <!-- Copy all references to output folder (important for coverage tools) -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <UseDefaultStartup>true</UseDefaultStartup>
+    <XunitStartupAssembly>ServiceTitan.WizardTest.Testing</XunitStartupAssembly>
+    <XunitStartupFullName>WizardTest.Testing.Startup</XunitStartupFullName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoFixture"/>
+    <PackageReference Include="AutoFixture.AutoMoq"/>
+    <PackageReference Include="AutoFixture.Xunit2"/>
+    <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="FluentAssertions.Json"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+    <PackageReference Include="Moq"/>
+    <PackageReference Include="xunit"/>
+    <PackageReference Include="xunit.analyzers"/>
+    <PackageReference Include="Xunit.Combinatorial"/>
+    <PackageReference Include="xunit.runner.visualstudio"/>
+    <PackageReference Include="Xunit.DependencyInjection"/>
+    <PackageReference Include="coverlet.collector"/>
+    <ProjectReference Include="..\Testing\Testing.csproj" Condition="'$(AssemblyName)'!='ServiceTitan.WizardTest.Testing'"/>
+  </ItemGroup>
+  
+</Project>

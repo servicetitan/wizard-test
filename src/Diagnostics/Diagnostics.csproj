@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\App\App.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ServiceTitan.Platform.Diagnostics"/>
+    <PackageReference Include="ServiceTitan.Platform.Diagnostics.Prometheus"/>
+    <PackageReference Include="OpenTelemetry.Api"/>
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
+    <PackageReference Include="OpenTelemetry.Exporter.Console"/>
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http"/>
+  </ItemGroup>
+
+</Project>

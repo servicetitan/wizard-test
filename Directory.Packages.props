@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <EnablePackageVersionOverride>false</EnablePackageVersionOverride>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AspNetCoreVersion>8.0.0</AspNetCoreVersion>
+    <OpenTelemetryVersion>1.9.0</OpenTelemetryVersion>
+    <ServiceTitanPlatformVersion>3.72.4</ServiceTitanPlatformVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="FluentValidation" Version="11.5.1"/>
+    <PackageVersion Include="JetBrains.Annotations" Version="2022.3.1"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1"/>
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0"/>
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.5.109" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers"/>
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
+    <PackageVersion Include="OpenTelemetry" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Api" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Configuration" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Diagnostics" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Diagnostics.AspNetCore" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Diagnostics.OpenTelemetry" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Diagnostics.Prometheus" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Diagnostics.Testing" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.Toolkit" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="System.Formats.Asn1" Version="6.0.1"/>
+    <PackageVersion Include="System.Net.Http" Version="4.3.4"/>
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="6.0.4"/>
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1"/>
+    <PackageVersion Include="System.Text.Json" Version="8.0.4"/>
+    <PackageVersion Include="Scrutor" Version="4.2.2"/>
+    <PackageVersion Include="System.ServiceModel.Primitives" Version="6.0.0"/>
+    <PackageVersion Include="OpenFeature" Version="2.0.0"/>
+    <PackageVersion Include="LaunchDarkly.OpenFeature.ServerProvider" Version="2.0.0"/>
+    <!--Swashbuckle dependencies -->
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+    <PackageVersion Include="ServiceTitan.Platform.BlobStorage" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="ServiceTitan.Platform.BlobStorage.AzureSdk" Version="$(ServiceTitanPlatformVersion)"/>
+    <PackageVersion Include="Refit" Version="6.3.2"/>
+    <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="$(AspNetCoreVersion)"/>
+  </ItemGroup>
+</Project>

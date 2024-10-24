@@ -1,2 +1,2 @@
-# wizard-test
-Wizard test repo
+
+# WizardTest

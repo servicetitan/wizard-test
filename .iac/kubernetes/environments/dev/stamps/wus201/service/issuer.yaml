@@ -1,0 +1,26 @@
+- op: replace
+  path: /spec/acme/solvers/1/selector/dnsZones
+  value:
+    - wus201.dev.devtest.wizard-test.srv.st.dev
+- op: replace
+  path: /spec/acme/solvers/1/dns01/azureDNS
+  value:
+    subscriptionID: '779a5063-23c3-4ca8-9294-7c37c60e3e10'
+    resourceGroupName: 'dev-wus201-infra'
+    hostedZoneName: 'wus201.dev.devtest.wizard-test.srv.st.dev'
+    environment: AzurePublicCloud
+    managedIdentity:
+      clientID: '{cert-manager-ami.clientId}'
+- op: replace
+  path: /spec/acme/solvers/2/selector/dnsZones
+  value:
+    - dev.devtest.wizard-test.srv.st.dev
+- op: replace
+  path: /spec/acme/solvers/2/dns01/azureDNS
+  value:
+    subscriptionID: '779a5063-23c3-4ca8-9294-7c37c60e3e10'
+    resourceGroupName: 'dev-auto'
+    hostedZoneName: 'dev.devtest.wizard-test.srv.st.dev'
+    environment: AzurePublicCloud
+    managedIdentity:
+      clientID: '{cert-manager-ami.clientId}'

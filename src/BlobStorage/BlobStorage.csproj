@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <ProjectReference Include="..\App\App.csproj" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder"/>
+      <PackageReference Include="ServiceTitan.Platform.BlobStorage.AzureSdk" />
+    </ItemGroup>
+
+</Project>

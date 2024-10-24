@@ -1,0 +1,7 @@
+- op: replace
+  path: 'spec/spec/tls/0/hosts'
+  value:
+    - service.wus201.dev.devtest.wizard-test.srv.st.dev
+- op: replace
+  path: 'spec/spec/rules/0/host'
+  value: service.wus201.dev.devtest.wizard-test.srv.st.dev

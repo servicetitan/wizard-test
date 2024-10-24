@@ -1,0 +1,11 @@
+name: pull-request-closed
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  closed:
+    uses: servicetitan/infra-iac-poc/.github/workflows/pr-resources-cleanup.yaml@master
+    secrets: inherit

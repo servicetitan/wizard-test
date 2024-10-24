@@ -1,0 +1,39 @@
+# Runs on every commit to main
+name: pull-request
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+      - dev/*
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    permissions: write-all
+    
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.ST_INFRA_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.ST_INFRA_PLATFORM_APP_SECRET }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run tests in Okteto
+        uses: servicetitan/infra-iac-poc/actions/okteto-test@master
+        with:
+          okteto-pat: ${{ secrets.ST_OKTETO_PAT }}
+          test-command: 'cd /app && chmod +x ./scripts/cicd/run-tests.sh && ./scripts/cicd/run-tests.sh'
+          include-stryker: 'false'
+          token: ${{ github.token }}
+          gh-token: ${{ steps.app-token.outputs.token }}
+          st-nuget-key: ${{ secrets.ST_NUGET_PASSWORD }}
+          okteto-ami: ${{ secrets.OKTETO_DEPLOY_CLIENT_ID }}

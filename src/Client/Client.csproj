@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>$(AssemblyName)</RootNamespace>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Refit"/>
+    <PackageReference Include="ServiceTitan.Platform.Diagnostics"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder"/>
+    <PackageReference Include="Microsoft.Extensions.Http.Polly"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client.Contracts\Client.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
+

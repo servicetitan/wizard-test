@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data\AddWizardTestClient_HasSettings_ShouldRegisterClient.json" />
+    <EmbeddedResource Include="Data\AddWizardTestClient_NoEndpoint_ShouldThrow.json" />
+    <EmbeddedResource Include="Data\AddWizardTestClient_NoServiceEntityClientSettings_ShouldThrow.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Client\Client.csproj" />
+  </ItemGroup>
+
+</Project>
