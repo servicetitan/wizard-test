@@ -21,7 +21,7 @@ spec:
       instance: kustomize:will:replace
       component: service
       team: infra
-      repository: repoNamePlaceholder
+      repository: wizard-test
     serviceAccount:
       name: service
     metrics:

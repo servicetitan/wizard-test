@@ -85,7 +85,7 @@ jobs:
           context-path: '.'
           dockerfile-path: './Dockerfile'
           target-name: web-api
-          image-name: repoNamePlaceholder
+          image-name: wizard-test
           build-args: 'ST__NuGetKey=${{ secrets.ST_NUGET_PASSWORD }}'
 
   deploy:
