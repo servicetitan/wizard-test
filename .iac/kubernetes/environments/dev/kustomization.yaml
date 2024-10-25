@@ -58,4 +58,4 @@ patches:
         name: DOES NOT MATTER
 
 commonLabels:
-  dev.okteto.com/deployed-by: repoNamePlaceholder
+  dev.okteto.com/deployed-by: wizard-test
